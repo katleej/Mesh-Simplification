@@ -12,7 +12,7 @@ Here is the full layout of our algorithm:
 3. Calculate the pair that has the lowest cost of edge contraction.
 4. Iteratively contract the minimum cost pair, and update costs of all other pairs involving the new contracted vertex.
 
-###### Edge Collapse and Contraction
+## Edge Collapse and Contraction
 The first step was writing edge contraction. This was done by calculating the new 
 optimal point between the two vertices. There are two ways of computing this optimal point, one which is introduced in Garland’s dissertation (where the optimal v = (-1) * inverse of A * b) and the other is our own customized solution. Our customized solution computes the midpoint of v1 and v2 while considering the difference in the degree of each vertex. The difference between the two approaches will be clearly seen in the demo below. Our optimal vertex equation is the following:
 
@@ -22,7 +22,7 @@ optimal point between the two vertices. There are two ways of computing this opt
 
 We then create a new vertex V with this optimal position, and reassign the necessary neighbors’s attributes to the new optimal vertex. One of the challenges we faced during this step was making the decision of using the old vertex versus creating a completely new one. After much debugging, we decided that creating a new vertex and reassigning the necessary parts was rather simpler than modifying the position of one of the vertices and reassigning all the parts connected to it. 
 
-###### Error Quadrics
+## Error Quadrics
 Garland proposed a computationally inexpensive solution to calculate the cost of each edge
 contraction. He associated a set of planes with every vertex of the model. More information on how we computed can be found [here](https://arjunsarup1998.github.io/cs184-final-project/).
 
@@ -30,24 +30,40 @@ contraction. He associated a set of planes with every vertex of the model. More 
 ## Results and Analysis
 Here is our progressive downsampling of teapot.dae using Garland's optimal v_bar to give an overview of how mesh simplification changes the mesh at each step. At each step, 90% of the faces at the previous steps remain.
 
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image11.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix1.gif)
 
-Here is a clear difference between the paper’s original optimal point versus our optimal point. The picture below on the left is when we use Garland’s method, and the other is when we use our own midpoint vertex point that weights two vertices based on their degrees. 
+Here is progressive downsampling using our own customized v_bar:
 
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image5.gif)
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image9.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix2.gif)
+
+We can see that both Garland's method and ours can preserve the overall structural integrity of the teapot even after various stages of downsampling. Topologies change, however, which should be expected given that we are deleting edges.
+
+
+A more pronounced difference, however, between Garland's methods and our own, is seen when we progressively downsample the cow mesh. In the gifs below, Garland's is on the left, ours on the right.
+
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix3.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix4.gif)
+
+
+In the first few progressive down-samples, Garland's structural quality matches our own. However, Garland's method is able to maintain structural integrity for a larger number of downsamples compared to our own, which becomes deformed after about 80% of the faces in the original mesh are removed.
+
+This suggests that Garland's v_bars are more robust, and able to withstand simpler resolutions.
 
 We have also experimented changing the multiplier value, which identifies the number of remaining faces that should be left after each call of downsample, and this number is computed by num_faces * multiplier. Therefore, higher the multiplier value, greater the level of simplification. Examples are shown below:
 
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image3.gif)
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image4.gif)
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image6.gif)
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image2.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix5.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix6.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix7.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix8.gif)
+cow.dae (optimal above, Top to Down: multiplier = 0.5, 0.25, 0.05, Garland’s optimal multiplier = 0.25)
 
-cow.dae (optimal above, L to R: multiplier = 0.5, 0.25, 0.05, Garland’s optimal multiplier = 0.25)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix9.gif)
+![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/fix10.gif)
+beast.dae (Top: before downsampling, Down: after two downsamples with multiplier = 0.65)
 
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image10.gif)
-![Image Description](https://github.com/katleej/Mesh-Simplification/blob/master/docs/images/image8.gif)
+## References
+The research paper that we found most helpful is Surface Simplification Using Quadric Error Metrics by Garland and Heckbert. In this paper, Garland and Heckbert use what is known as ‘edge contraction’ to merge the vertices on each end of the edge while maintaining the structure of the remaining triangles. They iterate this on a pair of vertices that compose an edge, or on a pair of vertices whose distance is less than the threshold that they define, and finally compute error quadric matrices. More information on their work can be found here: [Surface Simplification Using Quadric Error Metrics](https://www.cs.cmu.edu/~./garland/Papers/quadrics.pdf).
+
 
 
 
